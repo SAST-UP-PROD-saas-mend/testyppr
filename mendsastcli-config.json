@@ -1,0 +1,7 @@
+{
+  "scans": {
+    "engines": ["104"],
+    "maxFileSize": 1024,
+    "pythonEngineGeneration": 2
+  }
+}
