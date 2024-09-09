@@ -1,0 +1,171 @@
+{% extends 'base_admin.html' %}
+
+{% block content-header %}
+      <h1>
+        添加项目
+        <small></small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/admin"><i class="fa fa-home"></i>首页</a></li>
+        <li><a href="/admin/deploy/project">项目</a></li>
+        <li class="active">添加</li>
+      </ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+        <div class="col-xs-12">
+        <form role="form" method="post" action="">
+            {% csrf_token %}
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">常规配置</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+                <div class="box-body">
+                    <div class="form-group {% if form.name.errors %} has-error {% endif %}">
+                        <label for="name">{{ form.name.label }}</label>
+                        <input type="text" name="name" class="form-control" placeholder="" value="{% if form.name.value %}{{ form.name.value }}{% endif %}" >
+                        <span class="help-block">{{ form.ipaddr.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.vcs_type.errors %} has-error {% endif %}">
+                        <label for="vcs_type">{{ form.vcs_type.label }}</label>
+                        <select class="form-control" name="vcs_type">
+                            {% for item in type_choices %}
+                            <option value="{{ item.0 }}">{{ item.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="help-block">{{ form.vcs_type.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.repository_url.errors %} has-error {% endif %}">
+                        <label for="repository_url">{{ form.repository_url.label }}</label>
+                        <input type="text" name="repository_url" class="form-control" placeholder="" value="{% if form.repository_url.value %}{{ form.repository_url.value }}{% endif %}">
+                        <span class="help-block">{{ form.repository_url.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.credentials.errors %} has-error {% endif %}">
+                        <label for="credential">认证凭证</label>
+                        <select class="form-control" name="credentials">
+                            <option value="">选择认证凭证</option>
+                            {% for credential in credentials %}
+                            <option value="{{ credential.id }}" {% if credential.id == project.credentials.id %} selected {% endif %} >{{ credential.get_type_display }} | {{ credential.username }} | {{ credential.comment }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="help-block">{{ form.credentials.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.dest_path.errors %} has-error {% endif %}">
+                        <label for="dest_path">{{ form.dest_path.label }}</label>
+                        <input type="text" name="dest_path" class="form-control" placeholder="" value="{% if form.dest_path.value %}{{ form.dest_path.value }}{% endif %}">
+                        <span class="help-block">{{ form.dest_path.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.deploy_mode.errors %} has-error {% endif %}">
+                        <label for="deploy_mode">{{ form.deploy_mode.label }}</label>
+                        <select class="form-control" name="deploy_mode">
+                            {% for item in deploy_mode_choices %}
+                            <option value="{{ item.0 }}">{{ item.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="help-block">{{ form.deploy_mode.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.comment.errors %} has-error {% endif %}">
+                        <label for="comment">{{ form.comment.label }}</label>
+                        <input type="text" name="comment" class="form-control" placeholder="" value="{% if form.comment.value %}{{ form.comment.value }}{% else %}{% endif %}">
+                        <span class="help-block">{{ form.comment.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.exclude_file.errors %} has-error {% endif %}">
+                        <label for="exclude_file">{{ form.exclude_file.label }}</label>
+                        <textarea class="form-control" rows="5" name="exclude_file" placeholder="每行一个, 支持文件或路径"></textarea>
+                        <span class="help-block">{{ form.exclude_file.errors }}</span>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="1" name="{{ form.rsync_enable_delete.name }}" {% if form.rsync_enable_delete.value %}checked{% endif %}> {{ form.rsync_enable_delete.label }}
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="1" name="{{ form.enable_mail_notify.name }}" {% if form.enable_mail_notify.value %}checked{% endif %}> {{ form.enable_mail_notify.label }}
+                        </label>
+                    </div>
+
+                    <div class="form-group {% if form.dingding_robot_webhook.errors %} has-error {% endif %}">
+                        <label for="dingding_robot_webhook">{{ form.dingding_robot_webhook.label }}</label>
+                        <input type="text" name="dingding_robot_webhook" class="form-control" placeholder="" value="{% if form.dingding_robot_webhook.value %}{{ form.dingding_robot_webhook.value }}{% endif %}">
+                        <span class="help-block">{{ form.dingding_robot_webhook.errors }}</span>
+                    </div>
+
+                    <div class="form-group {% if form.status.errors %} has-error {% endif %}">
+                        <label for="status">{{ form.status.label }}</label>
+                        <select class="form-control" name="status">
+                            {% for item in status_choices %}
+                            <option value="{{ item.0 }}">{{ item.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="help-block">{{ form.status.errors }}</span>
+                    </div>
+
+              </div>
+              <!-- /.box-body -->
+
+            {% for env in envlist %}
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">{{ env.name }}环境</h3>
+                </div>
+
+                <div class="box-body">
+                    <input type="hidden" name="env" value="{{ env.id }}" >
+                    <div class="form-group">
+                        <label for="host_group_{{ env.id }}">绑定主机组</label>
+                        <select class="form-control" name="host_group_{{ env.id }}">
+                            <option value="">选择主机组</option>
+                            {% for group in host_group %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="help-block"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="branch_{{ env.id }}">对应分支名</label>
+                        <input type="text" name="branch_{{ env.id }}" class="form-control" placeholder="master" value="master">
+                        <span class="help-block">默认为<code>master</code></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="before_hook">发布前钩子(在发布机执行)</label>
+                        <textarea class="form-control" rows="5" name="before_hook_{{ env.id }}" placeholder="可以是任意脚本语言，只要发布机支持。比如bash shell, php,python等;&#10;当前工作目录为工作区路径;"></textarea>
+                        <span class="help-block"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="after_hook">发布后钩子(在目标机器执行)</label>
+                        <textarea class="form-control" rows="5" name="after_hook_{{ env.id }}" placeholder="可以是任意脚本语言，只要目标机器支持。比如bash shell, php,python等;&#10;当前工作目录为目标机器部署路径;"></textarea>
+                        <span class="help-block"></span>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="box box-primary">
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </div>
+
+          </div>
+
+        </form>
+        </div>
+</div>
+{% endblock %}

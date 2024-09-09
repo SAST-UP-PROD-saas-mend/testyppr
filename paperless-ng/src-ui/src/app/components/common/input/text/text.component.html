@@ -1,0 +1,8 @@
+<div class="form-group">
+  <label [for]="inputId">{{title}}</label>
+  <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)">
+  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+  <div class="invalid-feedback">
+    {{error}}
+  </div>
+</div>

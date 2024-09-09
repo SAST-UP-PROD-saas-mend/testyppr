@@ -1,0 +1,79 @@
+{% extends 'base_front.html' %}
+
+{% block content-header %}
+<h1>
+    #{{ task.id }} <span style="margin-left:10px;">{{ task.project }}</span>
+    <span class="badge badge-secondary">{{ task.env }}</span>
+    <small>{{ task.project.repository_url }}</small>
+</h1>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              {% if rollback %}
+              <h3 class="box-title">正在回滚中...</h3>
+              {% else %}
+              <h3 class="box-title">正在发布中...</h3>
+              {% endif %}
+
+              <div class="box-tools">
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar progress-bar-aqua" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>
+              {% if rollback %}
+                回滚日志
+              {% else %}
+                发布日志
+              {% endif %}
+            </h4>
+            <div class="form-group">
+                <textarea id="log_body" style="background-color: #002b36; color: #586e75" class="form-control" rows="25"></textarea>
+            </div>
+        </div>
+    </div> <!-- end row -->
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(function () {
+        $('.select2').select2()
+    })
+    function getReleaseStatus() {
+        var url = "{% url 'deploy:release_status' task.id %}{% if rollback %}?&rollback=1{% endif %}";
+        $.ajax({
+            type: "GET",
+            url: url,
+            beforeSend: function() {
+            }
+        }).done(function(data) {
+            if(data.percent_value >= 100) {
+                location.href = "{% url 'deploy:detail' task.id %}"
+            }
+            $("#log_body").text(data.log_body);
+            $("#progress-bar").css('width', data.percent_value + '%');
+            $("#progress-bar").attr('aria-valuenow', data.percent_value);
+        }).fail(function(data,textStatus, xhr) {
+        });
+    }
+    setInterval(getReleaseStatus, 3000);
+</script>
+{% endblock %}

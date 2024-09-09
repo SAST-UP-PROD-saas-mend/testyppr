@@ -1,0 +1,153 @@
+{% extends 'base_admin.html' %}
+
+{% block content-header %}
+        <div class="modal fade" id="modal-default">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">系统提示</h4>
+              </div>
+              <div class="modal-body">
+                <p>确定删除项目吗?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                <a class="btn btn-danger btn-ok">删除</a>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+
+      <h1>
+        项目
+        <small></small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/admin"><i class="fa fa-home"></i>首页</a></li>
+        <li><a href="/admin/deploy/project">项目</a></li>
+        <li class="active">添加</li>
+      </ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">列表</h3>
+
+              <div class="box-tools">
+                  <form action="">
+                    <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" name="q" class="form-control pull-right" placeholder="搜索" value="{% if q %}{{ q }}{% endif %}">
+
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+                <tbody><tr>
+                  <th>ID</th>
+                  <th>名称</th>
+                  <th>仓库类型</th>
+                  <th>仓库地址</th>
+                  <th>部署模式</th>
+                  <th>状态</th>
+                  <th>更新时间</th>
+                  <th>操作</th>
+                </tr>
+                {% for item in projects %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.get_vcs_type_display }}</td>
+                    <td>{{ item.repository_url }}</td>
+                    <td>{{ item.get_deploy_mode_display }}</td>
+                    <td>
+                        {% if item.status == '1' %}
+                            <span class="label label-success">{{ item.get_status_display }}</span>
+                        {% else %}
+                            <span class="label label-danger">{{ item.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.updated_at }}</td>
+                    <td>
+                        <a title="编辑" data-toggle="tooltip" href="/admin/deploy/project/edit/{{ item.id }}"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-edit"></i></button></a>
+                        <button title="删除" data-href="{% url 'admin:deploy.project_del' item.id %}" data-id="{{ item.id }}" type="button" class="btn btn-danger btn-sm btnDelete" data-toggle="modal" data-target="#modal-default"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+              </tbody></table>
+            </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
+                            <ul class="pagination">
+                                {% if projects.has_previous %}
+                                <li class="page-item">
+                                <li class="paginate_button previous">
+                                    <a class="page-link" href="?page={{ projects.previous_page_number }}&{{ parameters }}" tabindex="-1">上一页</a>
+                                </li>
+                                {% else %}
+                                <li class="paginate_button previous disabled">
+                                  <a class="page-link" href="#" tabindex="-1">上一页</a>
+                                </li>
+                                {% endif %}
+
+                                {% if projects.number|add:'-4' > 1 %}
+                                    <li class="paginate_button">
+                                        <a href="?page={{ projects.number|add:'-5' }}">&hellip;</a>
+                                    </li>
+                                {% endif %}
+
+                                {% for i in projects.paginator.page_range %}
+                                    {% if projects.number == i %}
+                                        <li class="paginate_button active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% elif i > projects.number|add:'-5' and i < projects.number|add:'5' %}
+                                        <li class="paginate_button"><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if projects.paginator.num_pages > projects.number|add:'4' %}
+                                    <li class="paginate_button"><a href="?page={{ projects.number|add:'5' }}">&hellip;</a></li>
+                                {% endif %}
+                                {% if projects.has_next %}
+                                <li class="paginate_button next">
+                                    <a class="page-link" href="?page={{ projects.next_page_number }}&{{ parameters }}">下一页</a>
+                                </li>
+                                {% else %}
+                                <li class="paginate_button next disabled">
+                                    <a class="page-link" href="#">下一页</a>
+                                </li>
+                                {% endif %}
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('#modal-default').on('show.bs.modal', function(e) {
+            $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+        });
+    </script>
+
+{% endblock %}

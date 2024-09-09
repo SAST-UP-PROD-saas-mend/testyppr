@@ -1,0 +1,13 @@
+node_modules/
+site/
+.vagrant/
+.env
+*.pyc
+*.log
+.env.local
+.env.prod
+test_*.py
+test.py
+celerybeat.pid
+celerybeat-schedule
+celerybeat-schedule.db

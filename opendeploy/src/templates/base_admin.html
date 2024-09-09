@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {% load static %}
+    {% load startswith %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Opendeploy | 管理中心</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <meta name="author" content="x@ninjacn.com">
+  <link rel="stylesheet" href="{% static "css/common.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "css/skins/skin-blue.min.css" %}">
+
+  <!--[if lt IE 9]>
+  <script src="{% static "js/ie.js" %}"></script>
+  <![endif]-->
+
+</head>
+<!--sidebar-collapse-->
+<body class="hold-transition skin-blue  sidebar-mini ">
+<div class="wrapper">
+
+  <!-- Main Header -->
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="{% url 'admin:homepage' %}" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"><b>O</b></span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg"><b>Opendeploy</b></span>
+    </a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <!-- User Account Menu -->
+          <li class="dropdown user user-menu">
+            <!-- Menu Toggle Button -->
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <!-- The user image in the navbar-->
+              <img src="/static/img/user2-160x160.jpg" class="user-image" alt="User Image">
+              <!-- hidden-xs hides the username on small devices so only the image appears. -->
+              <span class="hidden-xs">
+                {% if user.first_name%}
+                {{ user.first_name }}
+                {% else %}
+                {{ user.username }}
+                {% endif %}
+              </span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- The user image in the menu -->
+              <li class="user-header">
+                <img src="/static/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+
+                <p>
+                {% if user.first_name%}
+                {{ user.first_name }}
+                {% else %}
+                {{ user.username }}
+                {% endif %}
+                </p>
+              </li>
+              <!-- Menu Body -->
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-default btn-flat">个人信息</a>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-default btn-flat">更改密码</a>
+                </div>
+                <div class="pull-right">
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-default btn-flat">注销</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+
+      <!-- Sidebar Menu -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="header">导航</li>
+        <li class="active hide"><a href="#"><i class="fa fa-link"></i> <span>Link</span></a></li>
+
+        <li class="treeview {% if request.path|startswith:'/admin/deploy/project' %} active {% endif %}">
+          <a href="#"><i class="fa fa-folder"></i> <span>项目</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+              <li><a href="{% url 'admin:deploy.project' %}"><i class="fa fa-circle-o"></i>列表</a></li>
+            <li><a href="{% url 'admin:deploy.project_add' %}"><i class="fa fa-circle-o"></i>添加</a></li>
+          </ul>
+        </li>
+
+        {% url 'admin:cmdb.host' as url_cmdb_host %}
+        <li class="treeview {% if request.path|startswith:'/admin/cmdb/' %} active {% endif %}">
+          <a href="#"><i class="fa fa-server"></i> <span>服务器主机</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'admin:cmdb.host' %}"><i class="fa fa-circle-o"></i>主机列表</a></li>
+            <li><a href="{% url 'admin:cmdb.host_add' %}"><i class="fa fa-circle-o"></i>添加主机</a></li>
+            <li><a href="{% url 'admin:cmdb.hostgroup' %}"><i class="fa fa-circle-o"></i>主机组列表</a></li>
+            <li><a href="{% url 'admin:cmdb.hostgroup_add' %}"><i class="fa fa-circle-o"></i>添加主机组</a></li>
+            <li><a href="{% url 'admin:cmdb.import_from_public_cloud' %}"><i class="fa fa-circle-o"></i>从公有云导入</a></li>
+          </ul>
+        </li>
+
+        <li class="treeview {% if request.path|startswith:'/admin/accounts' %} active {% endif %}">
+          <a href="#"><i class="fa fa-users"></i> <span>用户</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'admin:accounts.all_users' %}"><i class="fa fa-circle-o"></i>用户列表</a></li>
+            <li><a href="{% url 'admin:accounts.user_add' %}"><i class="fa fa-circle-o"></i>添加用户</a></li>
+          </ul>
+        </li>
+
+        <li class="treeview {% if request.path|startswith:'/admin/deploy/env' %} active {% endif %}">
+          <a href="#"><i class="fa fa-th-list"></i> <span>环境</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'admin:deploy.env' %}"><i class="fa fa-circle-o"></i>列表</a></li>
+            <li><a href="{% url 'admin:deploy.env_add' %}"><i class="fa fa-circle-o"></i>添加</a></li>
+          </ul>
+        </li>
+
+        <li class="treeview {% if request.path|startswith:'/admin/deploy/credential' %} active {% endif %}">
+          <a href="#"><i class="fa fa-key"></i> <span>账号凭证</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'admin:deploy.credential' %}"><i class="fa fa-circle-o"></i>列表</a></li>
+            <li><a href="{% url 'admin:deploy.credential_add' %}"><i class="fa fa-circle-o"></i>添加</a></li>
+          </ul>
+        </li>
+
+        <li class=" {% if request.path|startswith:'/admin/api/token' %} active {% endif %}"><a href="{% url 'admin:api.token' %}"><i class="fa fa-key"></i> <span>Api Token管理</span></a></li>
+
+        <li class="treeview {% if request.path|startswith:'/admin/setting/' %} active {% endif %}">
+          <a href="#"><i class="fa fa-cogs"></i> <span>设置</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+              <li><a href="{% url 'admin:setting.general' %}"><i class="fa fa-circle-o"></i>通用</a></li>
+            <li><a href="{% url 'admin:setting.mail' %}"><i class="fa fa-circle-o"></i>邮件通知</a></li>
+            <li><a href="{% url 'admin:setting.public_cloud' %}"><i class="fa fa-circle-o"></i>公有云</a></li>
+            <li><a href="{% url 'admin:setting.ldap' %}"><i class="fa fa-circle-o"></i>LDAP</a></li>
+          </ul>
+        </li>
+        <li><a href="{% url 'deploy:homepage' %}"><i class="fa fa-smile-o"></i> <span>返回站点</span></a></li>
+
+      </ul>
+      <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        {% block content-header %}
+        {% endblock %}
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="callout callout-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}success{% endif %}">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    {% include "base_common_footer.html" %}
+  </footer>
+
+  <!-- /.control-sidebar -->
+  <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED JS SCRIPTS -->
+<script>
+    var AdminLTEOptions = {
+        animationSpeed: "fast"
+    };
+</script>
+<script src="{% static "js/common.js" %}"></script>
+<script src="{% static "js/adminlte.min.js" %}"></script>
+{% block script %}
+{% endblock %}
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    })
+</script>
+</body>
+</html>

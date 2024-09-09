@@ -1,0 +1,198 @@
+{% extends 'base_front.html' %}
+
+{% block content-header %}
+        <div class="modal fade" id="modal-default">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">系统提示</h4>
+              </div>
+              <div class="modal-body">
+                <p>确定执行回滚吗?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">取消</button>
+                <a class="btn btn-danger btn-ok">回滚</a>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+<h1>
+    #{{ task.id }} <span style="margin-left:10px;">{{ task.project }}</span>
+    <span class="badge badge-secondary">{{ task.env }}</span>
+    <small>{{ task.project.repository_url }}</small>
+</h1>
+<ol class="breadcrumb">
+    <li><a href="{% url 'deploy:homepage' %}"><i class="fa fa-home"></i>首页</a></li>
+    <li class="active">任务详情-{{ task.id }}</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">任务详情</h3>
+
+              <div class="box-tools">
+                <a href="{% url 'deploy:diff' task.id %}">
+                  <button type="button" class="btn btn-primary btn-sm" ><i class="fa fa-code"></i>Diff</button>
+                </a>
+                  {% if can_rollback %}
+                  <button type="button" data-href="{% url 'deploy:rollback' task.id %}" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-default" ><i class="fa fa-undo"></i>执行回滚</button>
+                  {% endif %}
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table class="table table-hover">
+                <tbody>
+                    <tr>
+                      <th>状态</th>
+                      <td>
+                          {% if task.status == 0 %}
+                            <small class="text-muted">{{ task.get_status_display }}</small>
+                          {% elif task.status == 1 %}
+                            <small class="text-muted">{{ task.get_status_display }}</small>
+                          {% elif task.status == 2 %}
+                            <small class="label bg-green">{{ task.get_status_display }}</small>
+                          {% elif task.status == 3 %}
+                            <small class="label bg-red">{{ task.get_status_display }}</small>
+                          {% endif %}
+                    {% if task.status_rollback > 0 %}
+                    /
+                          {% if task.status_rollback == 0 %}
+                            <small class="text-muted">{{ task.get_status_rollback_display }}</small>
+                          {% elif task.status_rollback == 1 %}
+                            <small class="text-muted">{{ task.get_status_rollback_display }}</small>
+                          {% elif task.status_rollback == 2 %}
+                            <small class="label bg-green">{{ task.get_status_rollback_display }}</small>
+                          {% elif task.status_rollback == 3 %}
+                            <small class="label bg-red">{{ task.get_status_rollback_display }}</small>
+                          {% endif %}
+                    {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>发布范围</th>
+                      <td>
+                          {{ task.get_scope_display }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>发布版本</th>
+                      <td>
+                          {{ task.version }}
+                      </td>
+                    </tr>
+                    {% if task.scope %}
+                    <tr>
+                      <th>文件路径列表</th>
+                      <td>
+                          {{ task.files_list|linebreaksbr }}
+                      </td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                      <th>发布人</th>
+                      <td>
+                          {% if task.creater.first_name %} {{ task.creater.first_name }}{% else %}{{ task.creater }}{% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>创建时间</th>
+                      <td>
+                          {{ task.created_at }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>发布原因</th>
+                      <td>
+                          {{ task.comment }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>发布主机状态</th>
+                      <td>
+                          {% for host in taskHostRela %}
+                          {% if host.status_release == 0 %}
+                            <small class="label bg-muted">{{ host.host }}</small>
+                          {% elif host.status_release == 1 %}
+                            <small class="label bg-green">{{ host.host }}</small>
+                          {% elif host.status_release == 2 %}
+                            <small class="label bg-red">{{ host.host }}</small>
+                          {% endif %}
+                          {% endfor %}
+                      </td>
+                    </tr>
+                    {% if task.status_rollback > 0 %}
+                    <tr>
+                      <th>回滚主机状态</th>
+                      <td>
+                          {% for host in taskHostRela %}
+                          {% if host.status_rollback == 0 %}
+                            <small class="text-muted">{{ host.host }}</small>
+                          {% elif host.status_rollback == 1 %}
+                            <small class="label bg-green">{{ host.host }}</small>
+                          {% elif host.status_rollback == 2 %}
+                            <small class="label bg-red">{{ host.host }}</small>
+                          {% endif %}
+                          {% endfor %}
+                      </td>
+                    </tr>
+                   {% endif %}
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>发布日志
+                <a href="{% url 'deploy:release_log' task.id %}" target="_blank">
+                <button data-toggle="tooltip" data-placement="top" title="新窗口打开" type="button" class="btn btn-outline-primary btn-sm"><i class="fa fa-external-link" aria-hidden="true"></i></button>
+                </a>
+            </h4>
+            <div class="form-group">
+                <textarea style="background-color: #002b36; color: #586e75" class="form-control" rows="25">{% if release_log %}{{ release_log }}{% endif %}</textarea>
+            </div>
+        </div>
+    </div> <!-- end row -->
+
+
+    {% if task.status_rollback > 0 %}
+    <div class="row">
+        <div class="col-md-12">
+            <h4>回滚日志
+                <a href="{% url 'deploy:release_log' task.id %}?rollback=1" target="_blank">
+                <button data-toggle="tooltip" data-placement="top" title="新窗口打开" type="button" class="btn btn-outline-primary btn-sm"><i class="fa fa-external-link" aria-hidden="true"></i></button>
+                </a>
+            </h4>
+            <div class="form-group">
+                <textarea style="background-color: #002b36; color: #586e75" class="form-control" rows="25">{% if rollback_log %}{{ rollback_log }}{% endif %}</textarea>
+            </div>
+        </div>
+    </div> <!-- end row -->
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('#modal-default').on('show.bs.modal', function(e) {
+            $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+        });
+    </script>
+
+{% endblock %}
